@@ -40,6 +40,12 @@ import SlidingPuzzleGame from "./components/SlidingPuzzleGame";
 import BootScreen from "./components/BootScreen";
 import { soundEffects } from "./utils/audio";
 
+// The procedural puzzle engine is pure, dependency-free TypeScript, so it runs
+// in the browser too. We use it as a guaranteed fallback whenever the
+// /api/generate-puzzle endpoint is slow, unreachable, or not deployed â this
+// ensures a game always loads instead of the forging screen spinning forever.
+import { generatePuzzle } from "../puzzleEngine";
+
 // Default seed player profile
 const DEFAULT_PROFILE: PlayerProfile = {
   username: "MindExplorer",
@@ -314,18 +320,35 @@ export default function App() {
     }
 
     try {
-      const response = await fetch("/api/generate-puzzle", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, difficulty, isLocal }),
-      });
+      let rawData: any;
 
-      if (!response.ok) {
-        throw new Error("Logic Studio Server error while constructing board.");
+      try {
+        // Don't let a hanging/unreachable endpoint trap the player on the
+        // forging screen forever â bail out after a short timeout.
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        const response = await fetch("/api/generate-puzzle", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, difficulty, isLocal }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error("Logic Studio Server error while constructing board.");
+        }
+
+        rawData = await response.json();
+        console.log("Constructed puzzle response:", rawData);
+      } catch (fetchErr) {
+        // Endpoint unavailable, errored, or timed out: generate the puzzle
+        // locally with the exact same engine the server uses so the player can
+        // always start a game.
+        console.warn("Falling back to local puzzle engine:", fetchErr);
+        rawData = generatePuzzle(type, difficulty);
       }
-
-      const rawData = await response.json();
-      console.log("Constructed puzzle response:", rawData);
 
       // Structure appropriate play schemas
       const activeData: ActivePuzzle = {

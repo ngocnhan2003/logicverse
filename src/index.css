@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --font-pixel: "Press Start 2P", "JetBrains Mono", monospace;
 }
 
 html {
@@ -15,13 +16,76 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: #0A0B0E;
+  background-color: #05060A;
   color: #cbd5e1; /* text-slate-300 */
   overflow-y: auto;
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   GAME WORLD BACKDROP  —  neon grid floor + twinkling starfield
+   A fixed, full-viewport arcade scene that sits behind the app.
+   ============================================================ */
+.game-world {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(6, 182, 212, 0.12), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 90% 110%, rgba(168, 85, 247, 0.12), transparent 60%),
+    #05060A;
+  overflow: hidden;
+}
+
+/* Twinkling pixel stars */
+.game-world::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 70% 20%, rgba(103, 232, 249, 0.9), transparent),
+    radial-gradient(1px 1px at 40% 70%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 85% 60%, rgba(244, 114, 182, 0.8), transparent),
+    radial-gradient(1px 1px at 15% 80%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 55% 45%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 92% 12%, rgba(255, 255, 255, 0.6), transparent);
+  background-repeat: repeat;
+  animation: twinkle 5s steps(8) infinite;
+  opacity: 0.7;
+}
+
+/* Perspective neon grid floor scrolling toward the player */
+.game-world::after {
+  content: "";
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  bottom: -20%;
+  height: 70%;
+  background-image:
+    linear-gradient(rgba(6, 182, 212, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.35) 1px, transparent 1px);
+  background-size: 48px 48px;
+  transform: perspective(340px) rotateX(68deg);
+  transform-origin: bottom center;
+  mask-image: linear-gradient(to top, #000 5%, transparent 85%);
+  -webkit-mask-image: linear-gradient(to top, #000 5%, transparent 85%);
+  animation: gridScroll 2.4s linear infinite;
+}
+
+@keyframes gridScroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 48px; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.85; }
 }
 
 /* Animations */
@@ -52,6 +116,15 @@ body {
   z-index: 99999;
   pointer-events: none;
   opacity: 0.35;
+}
+
+/* Soft arcade-cabinet vignette so the screen feels like a tube monitor */
+.crt-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 180px 40px rgba(0, 0, 0, 0.75);
+  border-radius: 12px;
 }
 
 .scanline-flicker {
@@ -109,6 +182,99 @@ body {
   animation: insertion-blink 1.8s infinite;
 }
 
+/* ============================================================
+   ARCADE GAME UTILITIES
+   ============================================================ */
+
+/* Pixel arcade typeface helper */
+.font-pixel {
+  font-family: var(--font-pixel);
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+/* Layered chromatic text glow for the marquee logo */
+.text-arcade-logo {
+  color: #fff;
+  text-shadow:
+    0 0 6px rgba(6, 182, 212, 0.9),
+    0 0 14px rgba(6, 182, 212, 0.7),
+    3px 3px 0 rgba(244, 63, 94, 0.55),
+    -2px -2px 0 rgba(168, 85, 247, 0.45);
+}
+
+/* Hard blink used on "PRESS START" prompts */
+@keyframes hard-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.animate-blink {
+  animation: hard-blink 1s steps(1) infinite;
+}
+
+/* Gentle floating bob for hero elements */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-bob {
+  animation: bob 3s ease-in-out infinite;
+}
+
+/* Quick screen shake on entering a game / boot */
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -3px); }
+  80% { transform: translate(2px, 3px); }
+}
+.animate-shake {
+  animation: screen-shake 0.4s ease-in-out;
+}
+
+/* A scanline sweep that travels down the title screen */
+@keyframes sweep {
+  0% { transform: translateY(-120%); }
+  100% { transform: translateY(120%); }
+}
+.animate-sweep {
+  animation: sweep 4s linear infinite;
+}
+
+/* Chunky 3D arcade push-button. Apply on top of color utilities. */
+.arcade-btn {
+  position: relative;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow:
+    0 5px 0 rgba(0, 0, 0, 0.55),
+    0 6px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.06s ease, box-shadow 0.06s ease, filter 0.15s ease;
+}
+.arcade-btn:hover {
+  filter: brightness(1.08);
+}
+.arcade-btn:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.55),
+    0 2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Pixel-edged panel frame for a "game UI" container look */
+.pixel-frame {
+  border: 2px solid rgba(6, 182, 212, 0.35);
+  box-shadow:
+    0 0 0 2px rgba(5, 6, 10, 1),
+    0 0 0 4px rgba(6, 182, 212, 0.18),
+    0 0 24px rgba(6, 182, 212, 0.12);
+}
+
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 5px;
@@ -122,4 +288,15 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
+}
+
+/* Respect reduced-motion preferences for the busier arcade effects */
+@media (prefers-reduced-motion: reduce) {
+  .game-world::after,
+  .game-world::before,
+  .animate-sweep,
+  .animate-bob,
+  .animate-shake {
+    animation: none !important;
+  }
 }

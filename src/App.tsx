@@ -31,6 +31,12 @@ import {
 import SudokuGame from "./components/SudokuGame";
 import RuleDiscoveryGame from "./components/RuleDiscoveryGame";
 import BinaryPuzzleGame from "./components/BinaryPuzzleGame";
+import LightsOutGame from "./components/LightsOutGame";
+import CircuitLogicGame from "./components/CircuitLogicGame";
+import MemoryMatrixGame from "./components/MemoryMatrixGame";
+import CodebreakerGame from "./components/CodebreakerGame";
+import ColorFloodGame from "./components/ColorFloodGame";
+import SlidingPuzzleGame from "./components/SlidingPuzzleGame";
 import { soundEffects } from "./utils/audio";
 
 // Default seed player profile
@@ -43,7 +49,7 @@ const DEFAULT_PROFILE: PlayerProfile = {
   completedCount: 6,
   streakDays: 3,
   lastPlayedDate: null,
-  unlockedCategories: ["sudoku", "rule_discovery", "binary_puzzle"],
+  unlockedCategories: ["sudoku", "rule_discovery", "binary_puzzle", "lights_out", "circuit_logic", "memory_matrix", "codebreaker", "color_flood", "sliding_puzzle"],
 };
 
 // Initial leaderboard simulation
@@ -398,6 +404,52 @@ export default function App() {
           binaryInitial: initial,
           binarySolution: solution,
         };
+      } else if (rawData.type === "lights_out") {
+        const puzzleData = rawData.lightsOutPuzzle || rawData.puzzle || rawData;
+        activeData.lightsOutPuzzle = {
+          gridSize: puzzleData.gridSize || 5,
+          initialGrid: puzzleData.initialGrid || Array(5).fill(0).map(() => Array(5).fill(0).map(() => Math.random() > 0.5 ? 1 : 0)),
+        };
+      } else if (rawData.type === "circuit_logic") {
+        const puzzleData = rawData.circuitLogicPuzzle || rawData.puzzle || rawData;
+        activeData.circuitLogicPuzzle = {
+          inputs: puzzleData.inputs || ["A", "B", "C", "D"],
+          initialInputValues: puzzleData.initialInputValues || { A: 0, B: 0, C: 0, D: 0 },
+          gates: puzzleData.gates || [
+            { id: "G1", type: "XOR", inputs: ["A", "B"] },
+            { id: "G2", type: "OR", inputs: ["C", "D"] },
+            { id: "OUT", type: "AND", inputs: ["G1", "G2"] }
+          ],
+          targetOutputValue: typeof puzzleData.targetOutputValue === "number" ? puzzleData.targetOutputValue : 1,
+        };
+      } else if (rawData.type === "memory_matrix") {
+        const puzzleData = rawData.memoryMatrixPuzzle || rawData.puzzle || rawData;
+        activeData.memoryMatrixPuzzle = {
+          gridSize: puzzleData.gridSize || 4,
+          sequence: puzzleData.sequence || [{ r: 0, c: 0 }, { r: 1, c: 1 }, { r: 2, c: 2 }, { r: 3, c: 3 }],
+        };
+      } else if (rawData.type === "codebreaker") {
+        const puzzleData = rawData.codebreakerPuzzle || rawData.puzzle || rawData;
+        activeData.codebreakerPuzzle = {
+          codeLength: puzzleData.codeLength || 4,
+          maxGuesses: puzzleData.maxGuesses || 8,
+          availableColors: puzzleData.availableColors || ["#ef4444", "#3b82f6", "#10b981", "#f59e0b"],
+          secretCode: puzzleData.secretCode || ["#ef4444", "#3b82f6", "#10b981", "#f59e0b"],
+        };
+      } else if (rawData.type === "color_flood") {
+        const puzzleData = rawData.colorFloodPuzzle || rawData.puzzle || rawData;
+        activeData.colorFloodPuzzle = {
+          gridSize: puzzleData.gridSize || 8,
+          maxMoves: puzzleData.maxMoves || 15,
+          availableColors: puzzleData.availableColors || ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"],
+          initialGrid: puzzleData.initialGrid || Array(8).fill(0).map(() => Array(8).fill("#ef4444")),
+        };
+      } else if (rawData.type === "sliding_puzzle") {
+        const puzzleData = rawData.slidingPuzzle || rawData.puzzle || rawData;
+        activeData.slidingPuzzle = {
+          gridSize: puzzleData.gridSize || 3,
+          initialGrid: puzzleData.initialGrid || [[1, 2, 3], [4, 5, 6], [7, 8, 0]],
+        };
       } else {
         // rule_discovery
         const options = Array.isArray(rawData.ruleOptions) ? rawData.ruleOptions : ["A", "B", "C", "D"];
@@ -426,7 +478,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0B0E] text-slate-200 flex flex-col font-sans selection:bg-cyan-500 selection:text-black relative overflow-x-hidden p-4 md:p-8">
+    <div className="h-screen w-screen bg-[#0A0B0E] text-slate-200 flex flex-col font-sans selection:bg-cyan-500 selection:text-black relative overflow-hidden py-3 px-4 md:px-6">
       
       {/* 📟 Retro Scanline CRT Overlay */}
       {crtEnabled && <div className="crt-overlay scanline-flicker" />}
@@ -435,15 +487,15 @@ export default function App() {
       <div className="absolute top-[-10%] left-[-15%] w-[500px] h-[500px] rounded-full bg-cyan-950/10 filter blur-[100px] ambient-glow pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-15%] w-[600px] h-[600px] rounded-full bg-purple-950/5 filter blur-[120px] ambient-glow pointer-events-none" style={{ animationDelay: "4s" }} />
 
-      <div className="w-full max-w-7xl mx-auto flex flex-col flex-grow">
+      <div className="w-full max-w-7xl mx-auto flex flex-col flex-grow h-full min-h-0">
         {/* Header Navigation exactly matching retro arcade cabinet theme */}
-        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end border-b border-cyan-500/10 pb-6 mb-8 gap-4 w-full">
+        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end border-b border-cyan-500/10 pb-3 mb-4 gap-2 w-full flex-shrink-0">
           <div className="flex flex-col">
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2 h-2 rounded-full bg-cyan-500 animate-ping"></span>
               <span className="text-[10px] uppercase tracking-[0.4em] text-cyan-400 font-bold">★ LOGICVERSE RETRO GAME LAB ★</span>
             </div>
-            <h1 className="text-4xl font-light tracking-tight text-white">
+            <h1 className="text-2xl lg:text-3xl font-light tracking-tight text-white">
               LOGIC<span className="font-bold text-cyan-400 animate-pulse">VERSE</span>
               <span className="text-pink-500">.</span>
             </h1>
@@ -526,11 +578,11 @@ export default function App() {
         </header>
 
         {/* Dynamic Inner Layout Body */}
-        <main className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <main className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-4 items-start min-h-0 overflow-hidden">
           
           {/* Conditional Layout: Hide sidebar navigation if active workspace details are running so we have full screens mapping */}
           {!(activePlay || isForging) && (
-            <nav className="col-span-1 lg:col-span-3 flex flex-col gap-4">
+            <nav className="col-span-1 lg:col-span-3 flex flex-col gap-3 h-full overflow-y-auto pr-1">
               {/* Profile Heuristic Section */}
               <div className="bg-[#15171C] p-4 rounded-xl border border-cyan-500/15 shadow-neon-cyan relative overflow-hidden">
                 <div className="absolute top-0 right-0 bg-cyan-500/10 border-l border-b border-cyan-500/20 px-2 py-0.5 text-[7px] font-mono font-bold text-cyan-400 uppercase">
@@ -620,7 +672,7 @@ export default function App() {
 
                   <li 
                     onClick={() => selectTab("daily")}
-                    className={`flex justify-between items-center p-2.5 rounded-lg border transition-all cursor-pointer select-none
+                    className={`flex justify-between items-center p-1.5 px-2 rounded-lg border transition-all cursor-pointer select-none
                       ${activeTab === "daily" 
                         ? "bg-amber-500/10 text-amber-500 border-amber-500/30 shadow-neon-amber" 
                         : "border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200"}`}
@@ -636,7 +688,7 @@ export default function App() {
 
                   <li 
                     onClick={() => selectTab("generator")}
-                    className={`flex justify-between items-center p-2.5 rounded-lg border transition-all cursor-pointer select-none
+                    className={`flex justify-between items-center p-1.5 px-2 rounded-lg border transition-all cursor-pointer select-none
                       ${activeTab === "generator" 
                         ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30 shadow-neon-cyan" 
                         : "border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200"}`}
@@ -650,7 +702,7 @@ export default function App() {
 
                   <li 
                     onClick={() => selectTab("leaderboard")}
-                    className={`flex justify-between items-center p-2.5 rounded-lg border transition-all cursor-pointer select-none
+                    className={`flex justify-between items-center p-1.5 px-2 rounded-lg border transition-all cursor-pointer select-none
                       ${activeTab === "leaderboard" 
                         ? "bg-purple-500/10 text-purple-400 border-purple-500/30 shadow-neon-amber" 
                         : "border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200"}`}
@@ -664,7 +716,7 @@ export default function App() {
 
                   <li 
                     onClick={() => selectTab("premium")}
-                    className={`flex justify-between items-center p-2.5 rounded-lg border transition-all cursor-pointer select-none
+                    className={`flex justify-between items-center p-1.5 px-2 rounded-lg border transition-all cursor-pointer select-none
                       ${activeTab === "premium" 
                         ? "bg-pink-500/10 text-pink-400 border-pink-500/30 shadow-neon-pink" 
                         : "border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200"}`}
@@ -679,18 +731,18 @@ export default function App() {
               </div>
 
               {/* Promo card exactly matching visual style */}
-              <div className="mt-2 p-5 bg-gradient-to-br from-[#10192A] to-[#152e3c] rounded-2xl relative overflow-hidden border border-cyan-500/20 shadow-lg">
+              <div className="mt-1 p-3 bg-gradient-to-br from-[#10192A] to-[#152e3c] rounded-2xl relative overflow-hidden border border-cyan-500/20 shadow-lg">
                 <div className="relative z-10">
-                  <p className="text-[11px] font-bold text-white/90 mb-1 uppercase tracking-wider flex items-center gap-1.5 font-mono">
+                  <p className="text-[10px] font-bold text-white/90 mb-1 uppercase tracking-wider flex items-center gap-1.5 font-mono">
                     <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                     UNLIMITED AI PUZZLES
                   </p>
-                  <p className="text-[10px] text-cyan-100 mb-4 opacity-75 leading-relaxed">
+                  <p className="text-[9px] text-cyan-100 mb-2 opacity-75 leading-relaxed">
                     Get infinite, smart logical structures with our live Gemini engine.
                   </p>
                   <button 
                     onClick={() => setActiveTab("premium")}
-                    className="w-full py-2 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 text-xs font-bold rounded-lg uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(6,182,212,0.15)] active:scale-95"
+                    className="w-full py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 text-xs font-bold rounded-lg uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(6,182,212,0.15)] active:scale-95"
                   >
                     Upgrade Pro
                   </button>
@@ -701,7 +753,7 @@ export default function App() {
           )}
 
           {/* Right Section Content viewport */}
-          <section className={`col-span-1 lg:col-span-9 ${ (activePlay || isForging) ? 'lg:col-span-12 w-full max-w-4xl mx-auto' : '' } flex flex-col gap-6`}>
+          <section className={`col-span-1 ${ (activePlay || isForging) ? 'lg:col-span-12 w-full max-w-4xl mx-auto' : 'lg:col-span-9 h-full flex flex-col min-h-0' } gap-3`}>
             
             <AnimatePresence mode="wait">
               
@@ -763,6 +815,72 @@ export default function App() {
                       onExit={() => setActivePlay(null)}
                     />
                   )}
+
+                  {activePlay.type === "lights_out" && activePlay.lightsOutPuzzle && (
+                    <LightsOutGame
+                      puzzle={{
+                        ...activePlay.lightsOutPuzzle,
+                        difficulty: activePlay.difficulty,
+                      }}
+                      onComplete={handleGameComplete}
+                      onExit={() => setActivePlay(null)}
+                    />
+                  )}
+
+                  {activePlay.type === "circuit_logic" && activePlay.circuitLogicPuzzle && (
+                    <CircuitLogicGame
+                      puzzle={{
+                        ...activePlay.circuitLogicPuzzle,
+                        difficulty: activePlay.difficulty,
+                      }}
+                      onComplete={handleGameComplete}
+                      onExit={() => setActivePlay(null)}
+                    />
+                  )}
+
+                  {activePlay.type === "memory_matrix" && activePlay.memoryMatrixPuzzle && (
+                    <MemoryMatrixGame
+                      puzzle={{
+                        ...activePlay.memoryMatrixPuzzle,
+                        difficulty: activePlay.difficulty,
+                      }}
+                      onComplete={handleGameComplete}
+                      onExit={() => setActivePlay(null)}
+                    />
+                  )}
+
+                  {activePlay.type === "codebreaker" && activePlay.codebreakerPuzzle && (
+                    <CodebreakerGame
+                      puzzle={{
+                        ...activePlay.codebreakerPuzzle,
+                        difficulty: activePlay.difficulty,
+                      }}
+                      onComplete={handleGameComplete}
+                      onExit={() => setActivePlay(null)}
+                    />
+                  )}
+
+                  {activePlay.type === "color_flood" && activePlay.colorFloodPuzzle && (
+                    <ColorFloodGame
+                      puzzle={{
+                        ...activePlay.colorFloodPuzzle,
+                        difficulty: activePlay.difficulty,
+                      }}
+                      onComplete={handleGameComplete}
+                      onExit={() => setActivePlay(null)}
+                    />
+                  )}
+
+                  {activePlay.type === "sliding_puzzle" && activePlay.slidingPuzzle && (
+                    <SlidingPuzzleGame
+                      puzzle={{
+                        ...activePlay.slidingPuzzle,
+                        difficulty: activePlay.difficulty,
+                      }}
+                      onComplete={handleGameComplete}
+                      onExit={() => setActivePlay(null)}
+                    />
+                  )}
                 </motion.div>
               ) : isForging ? (
                 
@@ -794,45 +912,45 @@ export default function App() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="flex flex-col gap-6"
+                  className="flex flex-col gap-3 h-full overflow-y-auto pr-1 pb-4"
                 >
                   {activeTab === "dashboard" && (
                     <>
                       {/* Daily Neural Convergence Banner exactly styled after template */}
-                      <div className="relative bg-[#15171C] border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group overflow-hidden shadow-neon-amber">
+                      <div className="relative bg-[#15171C] border border-white/10 rounded-2xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group overflow-hidden shadow-neon-amber flex-shrink-0">
                         <div className="flex flex-col relative z-20">
-                          <div className="flex items-center gap-2 mb-2.5">
+                          <div className="flex items-center gap-2 mb-1">
                             <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-450 text-[9px] font-bold tracking-widest uppercase animate-pulse">
                               🎮 Active Streak: {profile.streakDays} Days
                             </span>
                           </div>
-                          <h2 className="text-2xl font-light text-slate-100 mb-2 font-display">Daily Neural Convergence</h2>
-                          <p className="text-slate-400 text-sm max-w-lg leading-relaxed font-sans">
-                            Complete all three cognitive challenges to protect your streaks and claim the ultimate daily multipliers!
+                          <h2 className="text-xl font-light text-slate-100 mb-1 font-display">Daily Neural Convergence</h2>
+                          <p className="text-slate-400 text-xs max-w-lg leading-relaxed font-sans line-clamp-1">
+                            Complete all challenges to protect your streaks and claim multipliers!
                           </p>
                         </div>
                         <div className="text-right flex flex-col items-start md:items-end flex-shrink-0 relative z-20 font-mono">
-                          <div className="text-3xl font-mono text-cyan-400 mb-3 font-semibold">+350 XP BONUS</div>
+                          <div className="text-xl font-mono text-cyan-400 mb-2 font-semibold">+350 XP BONUS</div>
                           <button 
                             onClick={() => selectTab("daily")}
-                            className="px-8 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-450 text-slate-950 font-bold text-xs uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] cursor-pointer"
+                            className="px-6 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-450 text-slate-950 font-bold text-[10px] uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] cursor-pointer"
                           >
                             Begin Trilogy
                           </button>
                         </div>
-                        <div className="absolute left-0 top-0 w-1.5 h-full bg-gradient-to-b from-amber-500 to-yellow-500"></div>
+                        <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-amber-500 to-yellow-500"></div>
                       </div>
 
-                      {/* Game Card Grids with three cards matching custom visual structures */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {/* Game Card Grids with matching custom visual structures */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 flex-shrink-0">
                         
                         {/* Game Card 1 */}
                         <div 
                           onMouseEnter={() => soundEffects.playTick()}
-                          className="bg-[#15171C] border border-white/10 p-5 rounded-2xl hover:border-cyan-500/50 hover:shadow-neon-cyan transition-all flex flex-col justify-between group h-full shadow-sm"
+                          className="bg-[#15171C] border border-white/10 p-3 rounded-2xl hover:border-cyan-500/50 hover:shadow-neon-cyan transition-all flex flex-col justify-between group h-full shadow-sm"
                         >
                           <div>
-                            <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-4 border border-cyan-500/20">
+                            <div className="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-2 border border-cyan-500/20">
                               <div className="grid grid-cols-2 gap-0.5">
                                 <div className="w-1.5 h-1.5 bg-cyan-500 animate-pulse"></div>
                                 <div className="w-1.5 h-1.5 bg-cyan-500/30"></div>
@@ -840,11 +958,11 @@ export default function App() {
                                 <div className="w-1.5 h-1.5 bg-cyan-500 animate-pulse"></div>
                               </div>
                             </div>
-                            <h3 className="text-white font-medium mb-1.5 text-base group-hover:text-cyan-400 transition-colors font-display">Sudoku Matrix</h3>
-                            <p className="text-xs text-slate-400 mb-4 leading-relaxed">Classic coordinate solver featuring arrow constraints and even/odd rules.</p>
+                            <h3 className="text-white font-medium mb-1 text-sm group-hover:text-cyan-400 transition-colors font-display">Sudoku Matrix</h3>
+                            <p className="text-[10px] text-slate-400 mb-2 leading-relaxed line-clamp-2">Classic coordinate solver featuring arrow constraints and even/odd rules.</p>
                           </div>
                           
-                          <div className="flex flex-col gap-2 pt-4 border-t border-white/[0.04] mt-auto">
+                          <div className="flex flex-col gap-2 pt-2 border-t border-white/[0.04] mt-auto">
                             <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono">
                               <span>PROG: {dailyCompleted.sudoku ? "100%" : "0%"}</span>
                               <div className="flex gap-0.5">
@@ -875,17 +993,17 @@ export default function App() {
                         {/* Game Card 2 */}
                         <div 
                           onMouseEnter={() => soundEffects.playTick()}
-                          className="bg-[#15171C] border border-white/10 p-5 rounded-2xl hover:border-amber-500/50 hover:shadow-neon-amber transition-all flex flex-col justify-between group h-full shadow-sm"
+                          className="bg-[#15171C] border border-white/10 p-3 rounded-2xl hover:border-amber-500/50 hover:shadow-neon-amber transition-all flex flex-col justify-between group h-full shadow-sm"
                         >
                           <div>
-                            <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 border border-amber-500/20">
-                              <span className="text-amber-500 font-bold text-lg italic font-mono animate-bounce">?</span>
+                            <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center mb-2 border border-amber-500/20">
+                              <span className="text-amber-500 font-bold text-sm italic font-mono animate-bounce">?</span>
                             </div>
-                            <h3 className="text-white font-medium mb-1.5 text-base group-hover:text-amber-450 transition-colors font-display">Rule Discovery</h3>
-                            <p className="text-xs text-slate-400 mb-4 leading-relaxed font-sans">Uncover mathematical sequences across logical chains.</p>
+                            <h3 className="text-white font-medium mb-1 text-sm group-hover:text-amber-450 transition-colors font-display">Rule Discovery</h3>
+                            <p className="text-[10px] text-slate-400 mb-2 leading-relaxed font-sans line-clamp-2">Uncover mathematical sequences across logical chains.</p>
                           </div>
                           
-                          <div className="flex flex-col gap-2 pt-4 border-t border-white/[0.04] mt-auto">
+                          <div className="flex flex-col gap-2 pt-2 border-t border-white/[0.04] mt-auto">
                             <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono">
                               <span>PROG: {dailyCompleted.rule_discovery ? "100%" : "0%"}</span>
                               <div className="flex gap-0.5">
@@ -916,20 +1034,20 @@ export default function App() {
                         {/* Game Card 3 */}
                         <div 
                           onMouseEnter={() => soundEffects.playTick()}
-                          className="bg-[#15171C] border border-white/10 p-5 rounded-2xl hover:border-pink-500/50 hover:shadow-neon-pink transition-all flex flex-col justify-between group h-full shadow-sm"
+                          className="bg-[#15171C] border border-white/10 p-3 rounded-2xl hover:border-pink-500/50 hover:shadow-neon-pink transition-all flex flex-col justify-between group h-full shadow-sm"
                         >
                           <div>
-                            <div className="w-10 h-10 bg-pink-500/10 rounded-lg flex items-center justify-center mb-4 border border-pink-500/20">
+                            <div className="w-8 h-8 bg-pink-500/10 rounded-lg flex items-center justify-center mb-2 border border-pink-500/20">
                               <div className="flex flex-col gap-0.5 animate-pulse">
                                 <div className="flex gap-0.5"><div className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-ping"></div><div className="w-1.5 h-1.5 bg-slate-700 rounded-full font-mono font-bold"></div></div>
                                 <div className="flex gap-0.5"><div className="w-1.5 h-1.5 bg-slate-700 rounded-full font-mono font-bold"></div><div className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-ping" style={{ animationDelay: '0.4s' }}></div></div>
                               </div>
                             </div>
-                            <h3 className="text-white font-medium mb-1.5 text-base group-hover:text-pink-400 transition-colors font-display">Boolean Binary</h3>
-                            <p className="text-xs text-slate-400 mb-4 leading-relaxed font-sans font-medium">Fill 0 and 1 grids. Cross-reference constraints to target truths.</p>
+                            <h3 className="text-white font-medium mb-1 text-sm group-hover:text-pink-400 transition-colors font-display">Boolean Binary</h3>
+                            <p className="text-[10px] text-slate-400 mb-2 leading-relaxed font-sans font-medium line-clamp-2">Fill 0 and 1 grids. Cross-reference constraints to target truths.</p>
                           </div>
                           
-                          <div className="flex flex-col gap-2 pt-4 border-t border-white/[0.04] mt-auto">
+                          <div className="flex flex-col gap-2 pt-2 border-t border-white/[0.04] mt-auto">
                             <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono">
                               <span>PROG: {dailyCompleted.binary_puzzle ? "100%" : "0%"}</span>
                               <div className="flex gap-0.5">
@@ -957,91 +1075,125 @@ export default function App() {
                           </div>
                         </div>
 
-                        {/* Interactive Bypass Locked Card 4 */}
-                        <div className="bg-[#15171C] border border-white/10 p-5 rounded-2xl opacity-60 flex flex-col justify-between h-full shadow-sm">
+                        {/* Interactive Neural Fray Card 4 */}
+                        <div 
+                          onMouseEnter={() => soundEffects.playTick()}
+                          className="bg-[#15171C] border border-white/10 p-3 rounded-2xl hover:border-cyan-500/50 hover:shadow-neon-cyan transition-all flex flex-col justify-between group h-full shadow-sm"
+                        >
                           <div>
-                            <div className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center mb-4 border border-white/5">
-                               <div className="w-4 h-0.5 bg-white/20"></div>
+                            <div className="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-2 border border-cyan-500/20">
+                              <div className="grid grid-cols-3 gap-[1px] animate-pulse">
+                                <div className="w-1 h-1 bg-cyan-400 rounded-full"></div>
+                                <div className="w-1 h-1 bg-slate-800 rounded-full"></div>
+                                <div className="w-1 h-1 bg-cyan-400 rounded-full"></div>
+                                <div className="w-1 h-1 bg-slate-800 rounded-full"></div>
+                                <div className="w-1 h-1 bg-cyan-400 rounded-full"></div>
+                                <div className="w-1 h-1 bg-slate-800 rounded-full"></div>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-1.5 mb-1.5">
-                              <span className="text-[9px] font-mono tracking-widest text-[#64748b] uppercase bg-slate-900 border border-slate-800 px-1.5 py-0.5 rounded">Spatial</span>
-                              <span className="text-[9px] font-mono text-slate-500">LOCKED</span>
+                            <div className="flex items-center gap-1.5 mb-1 text-[8px] font-mono">
+                              <span className="tracking-widest text-cyan-400 uppercase bg-cyan-500/10 border border-cyan-500/25 px-1 py-0.5 rounded">Neural</span>
+                              <span className="text-slate-500">READY</span>
                             </div>
-                            <h3 className="text-slate-400 font-medium mb-1">Spatial Cognitive Grid</h3>
-                            <p className="text-xs text-slate-500 mb-4 leading-relaxed font-sans">Multi-dimensional coordinate rotations. Unlock via Level 5 or Credits.</p>
+                            <h3 className="text-white font-medium mb-1 text-sm group-hover:text-cyan-405 transition-colors font-display">Neural Fray Grid</h3>
+                            <p className="text-[10px] text-slate-400 mb-2 leading-relaxed font-sans line-clamp-2">Invert intersecting coordinates to disable and clear the background static charges.</p>
                           </div>
                           
-                          <div className="flex justify-between items-center pt-4 border-t border-white/[0.04] mt-auto font-mono text-[10px]">
-                            <span className="text-slate-500 uppercase">Req Level: 5</span>
-                            <div className="font-bold flex items-center gap-1.5">
-                              <span>🔒</span>
-                              <button 
-                                onClick={() => {
-                                  if (profile.coins >= 200) {
-                                    saveProfile({ ...profile, coins: profile.coins - 200, level: Math.max(profile.level, 5) });
-                                    alert("Spatial heuristics bypassed! Cognitive Grid unlocked.");
-                                  } else {
-                                    alert("You need 200 Logic Credits (coins) to acquire!");
-                                  }
-                                }}
-                                className="bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/25 px-2 py-0.5 rounded text-[9px] transition-colors border border-cyan-500/20"
+                          <div className="flex flex-col gap-1 pt-2 border-t border-white/[0.04] mt-auto">
+                            <div className="flex gap-2.5 mt-1">
+                              <button
+                                onClick={() => forgePuzzle("lights_out", 4, true)}
+                                className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-mono border border-white/5 transition-all text-center cursor-pointer"
                               >
-                                Bypass (200 ¢)
+                                Decrypt Local
+                              </button>
+                              <button
+                                onClick={() => forgePuzzle("lights_out", 6)}
+                                className="flex-1 py-1.5 rounded-lg bg-cyan-650 hover:bg-cyan-555 bg-cyan-600 hover:bg-cyan-500 text-slate-950 text-[11px] font-bold shadow-[0_0_12px_rgba(6,182,212,0.3)] transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
+                              >
+                                <Cpu className="w-3 h-3 text-slate-950" />
+                                AI Grid
                               </button>
                             </div>
                           </div>
                         </div>
 
-                        {/* Event sequence Masters Card 5 */}
-                        <div className="bg-[#15171C] border border-white/10 p-5 rounded-2xl hover:border-cyan-500/50 transition-all flex flex-col justify-between group h-full shadow-sm">
+                        {/* Interactive Memory Matrix Card 5 */}
+                        <div 
+                          onMouseEnter={() => soundEffects.playTick()}
+                          className="bg-[#15171C] border border-white/10 p-3 rounded-2xl hover:border-pink-500/50 hover:shadow-neon-pink transition-all flex flex-col justify-between group h-full shadow-sm"
+                        >
                           <div>
-                            <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-4 border border-cyan-500/20">
-                              <div className="w-4 h-4 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin" style={{ animationDuration: '3s' }}></div>
+                            <div className="w-8 h-8 bg-pink-500/10 rounded-lg flex items-center justify-center mb-2 border border-pink-500/20">
+                              <div className="w-3 h-3 rounded-full border-2 border-pink-500 border-t-transparent animate-spin" style={{ animationDuration: '3s' }}></div>
                             </div>
-                            <h3 className="text-white font-medium mb-1">Sequence Master</h3>
-                            <p className="text-xs text-slate-400 mb-4 leading-relaxed">Reorder chronological loops and patterns inside memory tracks.</p>
+                            <div className="flex items-center gap-1.5 mb-1 text-[8px] font-mono">
+                              <span className="tracking-widest text-pink-400 uppercase bg-pink-500/10 border border-pink-500/25 px-1 py-0.5 rounded">Recall</span>
+                              <span className="text-slate-500">COGNITIVE</span>
+                            </div>
+                            <h3 className="text-white font-medium mb-1 text-sm group-hover:text-pink-405 transition-colors font-display">Sequence Decoder</h3>
+                            <p className="text-[10px] text-slate-400 mb-2 leading-relaxed font-sans font-medium line-clamp-2">Replicate complex structural flashing grid sequences on memory cache boards.</p>
                           </div>
-                          <div className="flex justify-between items-center pt-4 border-t border-white/[0.04] mt-auto">
-                            <span className="text-[10px] text-slate-500 font-mono tracking-tighter">AI AGENT MODULE</span>
-                            <div className="flex gap-2">
-                              <button 
-                                onClick={() => forgePuzzle("rule_discovery", 3, true)}
-                                className="px-3.5 py-1.5 bg-white/5 hover:bg-white/10 text-slate-300 font-mono rounded-lg text-[10px] border border-white/5 transition-all"
+                          
+                          <div className="flex flex-col gap-1 pt-2 border-t border-white/[0.04] mt-auto">
+                            <div className="flex gap-2.5 mt-1">
+                              <button
+                                onClick={() => forgePuzzle("memory_matrix", 4, true)}
+                                className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-mono border border-white/5 transition-all text-center cursor-pointer"
                               >
-                                Launch Local
+                                Retrace Local
+                              </button>
+                              <button
+                                onClick={() => forgePuzzle("memory_matrix", 6)}
+                                className="flex-1 py-1.5 rounded-lg bg-pink-650 hover:bg-pink-555 bg-pink-600 hover:bg-pink-500 text-slate-950 text-[11px] font-bold shadow-[0_0_12px_rgba(244,63,94,0.3)] transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
+                              >
+                                <Cpu className="w-3 h-3 text-slate-950" />
+                                AI Trace
                               </button>
                             </div>
                           </div>
                         </div>
 
-                        {/* Extra Neural AI Card 6 */}
-                        <div className="bg-[#15171C] border border-white/10 p-5 rounded-2xl hover:border-cyan-500/50 transition-all flex flex-col justify-between group/card h-full shadow-sm">
+                        {/* Interactive Gate Network Card 6 */}
+                        <div 
+                          onMouseEnter={() => soundEffects.playTick()}
+                          className="bg-[#15171C] border border-white/10 p-3 rounded-2xl hover:border-amber-500/50 hover:shadow-neon-amber transition-all flex flex-col justify-between group h-full shadow-sm"
+                        >
                           <div>
-                            <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 border border-amber-500/20">
-                              <div className="w-1.5 h-1.5 bg-amber-500 rounded-sm rotate-45 animate-pulse"></div>
+                            <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center mb-2 border border-amber-500/20">
+                              <Cpu className="w-4 h-4 text-amber-500 animate-pulse" />
                             </div>
-                            <h3 className="text-white font-medium mb-1">AI custom case</h3>
-                            <p className="text-xs text-slate-400 mb-4 leading-relaxed">Procedurially configured layout puzzles dynamically constructed.</p>
+                            <div className="flex items-center gap-1.5 mb-1 text-[8px] font-mono">
+                              <span className="tracking-widest text-amber-450 uppercase bg-amber-500/10 border border-amber-500/25 px-1 py-0.5 rounded">Silicon</span>
+                              <span className="text-slate-500">HARDWARE</span>
+                            </div>
+                            <h3 className="text-white font-medium mb-1 text-sm group-hover:text-amber-455 transition-colors font-display">Gate Network Calibration</h3>
+                            <p className="text-[10px] text-slate-400 mb-2 leading-relaxed font-sans line-clamp-2">Toggle binary input registers to route signals through logic gates successfully.</p>
                           </div>
-                          <div className="flex justify-between items-center pt-4 border-t border-white/[0.04] mt-auto">
-                            <span className="text-[10px] text-amber-500 font-mono tracking-tighter uppercase font-bold">Dynamic Puzzle</span>
-                            <button 
-                              onClick={() => {
-                                const modes: GameType[] = ["sudoku", "rule_discovery", "binary_puzzle"];
-                                const select = modes[Math.floor(Math.random() * modes.length)];
-                                forgePuzzle(select, 6);
-                              }}
-                              className="text-[10px] font-bold text-amber-500 hover:text-amber-450 flex items-center gap-1 group-hover/card:translate-x-1 transition-all cursor-pointer font-mono select-none"
-                            >
-                              GO PROTOCOL →
-                            </button>
+                          
+                          <div className="flex flex-col gap-1 pt-2 border-t border-white/[0.04] mt-auto">
+                            <div className="flex gap-2.5 mt-1">
+                              <button
+                                onClick={() => forgePuzzle("circuit_logic", 4, true)}
+                                className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-mono border border-white/5 transition-all text-center cursor-pointer"
+                              >
+                                Match Local
+                              </button>
+                              <button
+                                onClick={() => forgePuzzle("circuit_logic", 6)}
+                                className="flex-1 py-1.5 rounded-lg bg-amber-650 hover:bg-amber-555 bg-amber-600 hover:bg-amber-500 text-slate-950 text-[11px] font-bold shadow-[0_0_12px_rgba(245,158,11,0.3)] transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
+                              >
+                                <Cpu className="w-3 h-3 text-slate-950" />
+                                AI Calibrate
+                              </button>
+                            </div>
                           </div>
                         </div>
 
                       </div>
 
                       {/* 📦 Cognitive Lootbox Station */}
-                      <div className="bg-gradient-to-br from-[#1b1226] to-[#0A0B0E] border border-pink-500/20 rounded-2xl p-6 relative overflow-hidden shadow-neon-pink mt-6">
+                      <div className="bg-gradient-to-br from-[#1b1226] to-[#0A0B0E] border border-pink-500/20 rounded-2xl p-4 relative overflow-hidden shadow-neon-pink mt-3 flex-shrink-0">
                         {lootboxOpening && (
                           <div className="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4 animate-flicker">
                             <div className="relative w-24 h-24 mb-4 flex items-center justify-center">
@@ -1213,7 +1365,7 @@ export default function App() {
                           <label className="block text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-2.5">
                             Select Logical Framework
                           </label>
-                          <div className="grid grid-cols-3 gap-2.5">
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
                             <button
                               onClick={() => setGenCategory("rule_discovery")}
                               className={`py-2.5 px-3 rounded-lg border-2 text-xs font-semibold text-center transition-all font-mono
@@ -1222,7 +1374,7 @@ export default function App() {
                                   : "bg-white/5 border-transparent text-slate-400 hover:text-white"}`}
                               style={{ borderColor: genCategory === 'rule_discovery' ? '#06b6d4' : '', color: genCategory === 'rule_discovery' ? '#22d3ee' : '' }}
                             >
-                              Sequence Rules
+                              Sequence
                             </button>
 
                             <button
@@ -1233,7 +1385,7 @@ export default function App() {
                                   : "bg-white/5 border-transparent text-slate-400 hover:text-white"}`}
                               style={{ borderColor: genCategory === 'sudoku' ? '#06b6d4' : '', color: genCategory === 'sudoku' ? '#22d3ee' : '' }}
                             >
-                              Sudoku Matrix
+                              Sudoku
                             </button>
 
                             <button
@@ -1244,7 +1396,73 @@ export default function App() {
                                   : "bg-white/5 border-transparent text-slate-400 hover:text-white"}`}
                               style={{ borderColor: genCategory === 'binary_puzzle' ? '#06b6d4' : '', color: genCategory === 'binary_puzzle' ? '#22d3ee' : '' }}
                             >
-                              Boolean Binary
+                              Boolean
+                            </button>
+
+                            <button
+                              onClick={() => setGenCategory("lights_out")}
+                              className={`py-2.5 px-3 rounded-lg border-2 text-xs font-semibold text-center transition-all font-mono
+                                ${genCategory === "lights_out" 
+                                  ? "bg-cyan-500/10 border-cyan-555 text-cyan-405" 
+                                  : "bg-white/5 border-transparent text-slate-400 hover:text-white"}`}
+                              style={{ borderColor: genCategory === 'lights_out' ? '#06b6d4' : '', color: genCategory === 'lights_out' ? '#22d3ee' : '' }}
+                            >
+                              Neural Grid
+                            </button>
+
+                            <button
+                              onClick={() => setGenCategory("circuit_logic")}
+                              className={`py-2.5 px-3 rounded-lg border-2 text-xs font-semibold text-center transition-all font-mono
+                                ${genCategory === "circuit_logic" 
+                                  ? "bg-cyan-500/10 border-cyan-555 text-cyan-405" 
+                                  : "bg-white/5 border-transparent text-slate-400 hover:text-white"}`}
+                              style={{ borderColor: genCategory === 'circuit_logic' ? '#06b6d4' : '', color: genCategory === 'circuit_logic' ? '#22d3ee' : '' }}
+                            >
+                              Circuit Gate
+                            </button>
+
+                            <button
+                              onClick={() => setGenCategory("memory_matrix")}
+                              className={`py-2.5 px-3 rounded-lg border-2 text-xs font-semibold text-center transition-all font-mono
+                                ${genCategory === "memory_matrix" 
+                                  ? "bg-cyan-500/10 border-cyan-555 text-cyan-405" 
+                                  : "bg-white/5 border-transparent text-slate-400 hover:text-white"}`}
+                              style={{ borderColor: genCategory === 'memory_matrix' ? '#06b6d4' : '', color: genCategory === 'memory_matrix' ? '#22d3ee' : '' }}
+                            >
+                              Recall Matrix
+                            </button>
+
+                            <button
+                              onClick={() => setGenCategory("codebreaker")}
+                              className={`py-2.5 px-3 rounded-lg border-2 text-xs font-semibold text-center transition-all font-mono
+                                ${genCategory === "codebreaker" 
+                                  ? "bg-cyan-500/10 border-cyan-555 text-cyan-405" 
+                                  : "bg-white/5 border-transparent text-slate-400 hover:text-white"}`}
+                              style={{ borderColor: genCategory === 'codebreaker' ? '#06b6d4' : '', color: genCategory === 'codebreaker' ? '#22d3ee' : '' }}
+                            >
+                              Cipher Code
+                            </button>
+
+                            <button
+                              onClick={() => setGenCategory("color_flood")}
+                              className={`py-2.5 px-3 rounded-lg border-2 text-xs font-semibold text-center transition-all font-mono
+                                ${genCategory === "color_flood" 
+                                  ? "bg-cyan-500/10 border-cyan-555 text-cyan-405" 
+                                  : "bg-white/5 border-transparent text-slate-400 hover:text-white"}`}
+                              style={{ borderColor: genCategory === 'color_flood' ? '#06b6d4' : '', color: genCategory === 'color_flood' ? '#22d3ee' : '' }}
+                            >
+                              Viral Flood
+                            </button>
+
+                            <button
+                              onClick={() => setGenCategory("sliding_puzzle")}
+                              className={`py-2.5 px-3 rounded-lg border-2 text-xs font-semibold text-center transition-all font-mono
+                                ${genCategory === "sliding_puzzle" 
+                                  ? "bg-cyan-500/10 border-cyan-555 text-cyan-405" 
+                                  : "bg-white/5 border-transparent text-slate-400 hover:text-white"}`}
+                              style={{ borderColor: genCategory === 'sliding_puzzle' ? '#06b6d4' : '', color: genCategory === 'sliding_puzzle' ? '#22d3ee' : '' }}
+                            >
+                              Number Grid
                             </button>
                           </div>
                         </div>

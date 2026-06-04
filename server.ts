@@ -227,6 +227,180 @@ function getLocalBinaryPuzzle(difficulty: number) {
   };
 }
 
+function getLocalLightsOut(difficulty: number) {
+  const gridSize = 5;
+  const grid = Array(gridSize).fill(0).map(() => Array(gridSize).fill(0));
+  
+  const movesCount = 5 + Math.min(difficulty, 8);
+  for (let m = 0; m < movesCount; m++) {
+    const r = Math.floor(Math.random() * gridSize);
+    const c = Math.floor(Math.random() * gridSize);
+    const cells = [
+      [r, c],
+      [r - 1, c],
+      [r + 1, c],
+      [r, c - 1],
+      [r, c + 1],
+    ];
+    cells.forEach(([tr, tc]) => {
+      if (tr >= 0 && tr < gridSize && tc >= 0 && tc < gridSize) {
+        grid[tr][tc] = grid[tr][tc] === 1 ? 0 : 1;
+      }
+    });
+  }
+
+  // Double check it's not pre-solved
+  const solved = grid.every(row => row.every(v => v === 0));
+  if (solved) {
+    grid[0][0] = 1;
+    grid[0][1] = 1;
+    grid[1][0] = 1;
+  }
+
+  return {
+    type: "lights_out",
+    difficulty,
+    questionText: "Neural Fray: All nodes must be empty (dark) to complete the security handshake.",
+    lightsOutPuzzle: {
+      gridSize,
+      initialGrid: grid
+    }
+  };
+}
+
+function getLocalCircuitLogic(difficulty: number) {
+  const inputs = ["A", "B", "C", "D"];
+  const initialInputValues = { A: 0, B: 0, C: 0, D: 0 };
+  
+  const gateTypes: ("AND" | "OR" | "XOR")[] = ["AND", "OR", "XOR"];
+  const type1 = gateTypes[Math.floor(Math.random() * gateTypes.length)];
+  const type2 = gateTypes[Math.floor(Math.random() * gateTypes.length)];
+  const type3 = gateTypes[Math.floor(Math.random() * gateTypes.length)];
+
+  const gates = [
+    { id: "G1", type: type1, inputs: ["A", "B"] },
+    { id: "G2", type: type2, inputs: ["C", "D"] },
+    { id: "OUT", type: type3, inputs: ["G1", "G2"] }
+  ];
+
+  return {
+    type: "circuit_logic",
+    difficulty,
+    questionText: "Gate Network Calibration: Configure PIN registers so the terminal output OUT evaluates to 1.",
+    circuitLogicPuzzle: {
+      inputs,
+      initialInputValues,
+      gates,
+      targetOutputValue: 1
+    }
+  };
+}
+
+function getLocalMemoryMatrix(difficulty: number) {
+  const gridSize = 4;
+  const seqLength = 4 + Math.min(difficulty, 4);
+  const sequence: { r: number, c: number }[] = [];
+
+  for (let i = 0; i < seqLength; i++) {
+    const r = Math.floor(Math.random() * gridSize);
+    const c = Math.floor(Math.random() * gridSize);
+    if (sequence.length > 0) {
+      const prev = sequence[sequence.length - 1];
+      if (prev.r === r && prev.c === c) {
+        sequence.push({ r: (r + 1) % gridSize, c });
+        continue;
+      }
+    }
+    sequence.push({ r, c });
+  }
+
+  return {
+    type: "memory_matrix",
+    difficulty,
+    questionText: "Neural Memory Matrix: Replicate the sequence flashing order on the grid.",
+    memoryMatrixPuzzle: {
+      gridSize,
+      sequence
+    }
+  };
+}
+
+function getLocalCodebreaker(difficulty: number) {
+  const codeLength = 4;
+  const maxGuesses = 8;
+  const availableColors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"];
+  const secretCode = Array(codeLength).fill("").map(() => availableColors[Math.floor(Math.random() * availableColors.length)]);
+
+  return {
+    type: "codebreaker",
+    difficulty,
+    questionText: "Codebreaker: Deduce the hidden color sequence. Feedback will show colors in correct positions and correct colors in wrong positions.",
+    codebreakerPuzzle: {
+      codeLength,
+      maxGuesses,
+      availableColors,
+      secretCode
+    }
+  };
+}
+
+function getLocalColorFlood(difficulty: number) {
+  const gridSize = 8;
+  const maxMoves = 15;
+  const availableColors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"];
+  const initialGrid = Array(gridSize).fill(0).map(() => 
+    Array(gridSize).fill("").map(() => availableColors[Math.floor(Math.random() * availableColors.length)])
+  );
+
+  return {
+    type: "color_flood",
+    difficulty,
+    questionText: "Color Flood: Change the color of your domain (starting top-left) to capture adjacent cells. Flood the entire grid within the move limit.",
+    colorFloodPuzzle: {
+      gridSize,
+      initialGrid,
+      maxMoves,
+      availableColors
+    }
+  };
+}
+
+function getLocalSlidingPuzzle(difficulty: number) {
+  const gridSize = 3; // 3x3 is 8-puzzle. 4x4 is 15-puzzle. Let's use 3x3 for simplicity.
+  const initialGrid = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 0]
+  ];
+
+  // Shuffle by making valid moves
+  const moves = 20 + difficulty * 10;
+  let r = 2, c = 2; // Position of 0
+  for (let m = 0; m < moves; m++) {
+    const neighbors = [];
+    if (r > 0) neighbors.push({nr: r - 1, nc: c});
+    if (r < gridSize - 1) neighbors.push({nr: r + 1, nc: c});
+    if (c > 0) neighbors.push({nr: r, nc: c - 1});
+    if (c < gridSize - 1) neighbors.push({nr: r, nc: c + 1});
+    
+    const next = neighbors[Math.floor(Math.random() * neighbors.length)];
+    initialGrid[r][c] = initialGrid[next.nr][next.nc];
+    initialGrid[next.nr][next.nc] = 0;
+    r = next.nr;
+    c = next.nc;
+  }
+
+  return {
+    type: "sliding_puzzle",
+    difficulty,
+    questionText: "Number Slider: Rearrange the matrix so the numbers are in sequential order from left to right, top to bottom.",
+    slidingPuzzle: {
+      gridSize,
+      initialGrid
+    }
+  };
+}
+
 // REST API for puzzle generation
 app.post("/api/generate-puzzle", async (req, res) => {
   const { type, difficulty } = req.body;
@@ -246,10 +420,16 @@ Ensure compliance with the requested type:
 1. "rule_discovery": Generate a number pattern, symbol pattern, or logic sequence. Provide 4 answer options where exactly ONE is correct.
 2. "sudoku": Generate a beautiful Sudoku puzzle of size 4 (4x4) or 6 (6x6) with standard rows/cols/block rules. If difficulty is high, write 6x6. Fill some cells in sudokuInitial (empty cells as 0). Complete sudokuSolution accurately. Optionally add "even_odd" special rule and designate evenCells coordinates containing even numbers (2, 4, 6).
 3. "binary_puzzle": Generate a 6x6 Binary puzzle. The board cells can be empty (-1) or preset (0 or 1). Ensure no three consecutive elements are same, and there are equal number of 0s and 1s per row and col in the binarySolution.
+4. "lights_out": Generate a 5x5 grid (gridSize: 5) for a Lights Out game (initialGrid containing 0s and 1s, where some are 1. The player clicks cells to toggle and must turn all to 0).
+5. "circuit_logic": Generate a logical gate circuit with named inputs ["A", "B", "C", "D"], initialInputValues (e.g. {A:0, B:0, C:0, D:0}), a array of gates (e.g., AND, OR, XOR gate objects, each having id, type, inputs: e.g. [{"id": "G1", "type": "AND", "inputs": ["A", "B"]}, {"id": "G2", "type": "OR", "inputs": ["C", "D"]}, {"id": "OUT", "type": "XOR", "inputs": ["G1", "G2"]}]), and a targetOutputValue (0 or 1).
+6. "memory_matrix": Generate a 4x4 matrix (gridSize: 4) flashing sequence containing 4 to 8 coordinate pairs, in standard { r: number, c: number } style.
+7. "codebreaker": Generate a Codebreaker/Mastermind game. codeLength is usually 4. maxGuesses: 8. availableColors: array of hex colors. secretCode: array of the hidden colors.
+8. "color_flood": Generate a Flood Fill game. gridSize: 8. initialGrid: an 8x8 matrix of color hex codes. maxMoves: 15. availableColors: array of the used hex colors.
+9. "sliding_puzzle": Generate a Number Slider game. gridSize: 3 for a 3x3 grid (8-puzzle). initialGrid: a 3x3 matrix representing the scrambled board, where 0 is the empty tile. Ensure the board is solvable!
 
 Return exactly configured JSON format. No extra markdown, no backticks, no comments.`;
 
-      const promptText = `Generate a logic puzzle:
+      const promptText = `Generate a puzzle:
 - Type: ${targetType}
 - Difficulty: ${targetDifficulty}/10
 - Format: JSON matching the standard responseSchema`;
@@ -263,7 +443,7 @@ Return exactly configured JSON format. No extra markdown, no backticks, no comme
           responseSchema: {
             type: Type.OBJECT,
             properties: {
-              type: { type: Type.STRING, description: "Either 'sudoku', 'rule_discovery', or 'binary_puzzle'" },
+              type: { type: Type.STRING, description: "Either 'sudoku', 'rule_discovery', 'binary_puzzle', 'lights_out', 'circuit_logic', or 'memory_matrix'" },
               difficulty: { type: Type.INTEGER },
               questionText: { type: Type.STRING, description: "Instructions or introductory riddle text" },
               
@@ -322,6 +502,117 @@ Return exactly configured JSON format. No extra markdown, no backticks, no comme
                   items: { type: Type.INTEGER }
                 },
                 description: "Solved binary matrix"
+              },
+
+              // Lights Out
+              lightsOutPuzzle: {
+                type: Type.OBJECT,
+                properties: {
+                  gridSize: { type: Type.INTEGER },
+                  initialGrid: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.ARRAY,
+                      items: { type: Type.INTEGER }
+                    }
+                  }
+                }
+              },
+
+              // Circuit Logic
+              circuitLogicPuzzle: {
+                type: Type.OBJECT,
+                properties: {
+                  inputs: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  },
+                  gates: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        id: { type: Type.STRING },
+                        type: { type: Type.STRING },
+                        inputs: {
+                          type: Type.ARRAY,
+                          items: { type: Type.STRING }
+                        }
+                      }
+                    }
+                  },
+                  targetOutputValue: { type: Type.INTEGER }
+                }
+              },
+
+              // Memory Matrix
+              memoryMatrixPuzzle: {
+                type: Type.OBJECT,
+                properties: {
+                  gridSize: { type: Type.INTEGER },
+                  sequence: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        r: { type: Type.INTEGER },
+                        c: { type: Type.INTEGER }
+                      }
+                    }
+                  }
+                }
+              },
+
+              // Codebreaker
+              codebreakerPuzzle: {
+                type: Type.OBJECT,
+                properties: {
+                  codeLength: { type: Type.INTEGER },
+                  maxGuesses: { type: Type.INTEGER },
+                  availableColors: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  },
+                  secretCode: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  }
+                }
+              },
+
+              // Color Flood
+              colorFloodPuzzle: {
+                type: Type.OBJECT,
+                properties: {
+                  gridSize: { type: Type.INTEGER },
+                  maxMoves: { type: Type.INTEGER },
+                  availableColors: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  },
+                  initialGrid: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.ARRAY,
+                      items: { type: Type.STRING }
+                    }
+                  }
+                }
+              },
+
+              // Sliding Puzzle
+              slidingPuzzle: {
+                type: Type.OBJECT,
+                properties: {
+                  gridSize: { type: Type.INTEGER },
+                  initialGrid: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.ARRAY,
+                      items: { type: Type.INTEGER }
+                    }
+                  }
+                }
               }
             },
             required: ["type", "difficulty", "questionText"]
@@ -354,6 +645,36 @@ Return exactly configured JSON format. No extra markdown, no backticks, no comme
     return res.json({
       source: "local-engine",
       ...getLocalBinaryPuzzle(targetDifficulty)
+    });
+  } else if (targetType === "lights_out") {
+    return res.json({
+      source: "local-engine",
+      ...getLocalLightsOut(targetDifficulty)
+    });
+  } else if (targetType === "circuit_logic") {
+    return res.json({
+      source: "local-engine",
+      ...getLocalCircuitLogic(targetDifficulty)
+    });
+  } else if (targetType === "memory_matrix") {
+    return res.json({
+      source: "local-engine",
+      ...getLocalMemoryMatrix(targetDifficulty)
+    });
+  } else if (targetType === "codebreaker") {
+    return res.json({
+      source: "local-engine",
+      ...getLocalCodebreaker(targetDifficulty)
+    });
+  } else if (targetType === "color_flood") {
+    return res.json({
+      source: "local-engine",
+      ...getLocalColorFlood(targetDifficulty)
+    });
+  } else if (targetType === "sliding_puzzle") {
+    return res.json({
+      source: "local-engine",
+      ...getLocalSlidingPuzzle(targetDifficulty)
     });
   } else {
     // Default Rule Discovery

@@ -296,7 +296,7 @@ export default function App() {
     const steps = [
       "Broadcasting constraints to LogicLab Engine...",
       "Analyzing player metrics & logical coefficients...",
-      isLocal ? "Consulting local pattern heuristics..." : "Initializing server-side Gemini AI models...",
+      "Consulting procedural pattern heuristics...",
       "Generating high-fidelity puzzle board matrix...",
       "Running recursive determinism solvability checks...",
       "Polishing interface visual constraints..."
@@ -305,7 +305,7 @@ export default function App() {
     // Simulate creative step-by-step puzzle forging process
     for (let i = 0; i < steps.length; i++) {
       setForgeStepMessage(steps[i]);
-      await new Promise((r) => setTimeout(r, isLocal ? 300 : 650));
+      await new Promise((r) => setTimeout(r, 250));
     }
 
     try {
@@ -722,10 +722,10 @@ export default function App() {
                 <div className="relative z-10">
                   <p className="text-[10px] font-bold text-white/90 mb-1 uppercase tracking-wider flex items-center gap-1.5 font-mono">
                     <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                    UNLIMITED AI FORGING
+                    UNLIMITED LOGIC FORGING
                   </p>
                   <p className="text-[9px] text-cyan-100 mb-2 opacity-75 leading-relaxed">
-                    All premium solvers, badges, alternative interfaces, and hints are 100% free.
+                    Get infinite mathematical and logic matrix structures dynamically configured for free.
                   </p>
                   <button 
                     onClick={() => setActiveTab("premium")}
@@ -1342,8 +1342,8 @@ export default function App() {
                           <Sparkles className="w-5 h-5 text-cyan-400" />
                         </div>
                         <div>
-                          <h2 className="text-xl font-light text-slate-100 uppercase">AI Puzzle Generation Lab</h2>
-                          <p className="text-xs text-slate-400 mt-1">Configure parameters to trigger high-complexity generative logic</p>
+                          <h2 className="text-xl font-light text-slate-100 uppercase">Logic Matrix Forging Lab</h2>
+                          <p className="text-xs text-slate-400 mt-1">Configure parameters to trigger high-complexity logical and arithmetic rules</p>
                         </div>
                       </div>
 
@@ -1478,7 +1478,7 @@ export default function App() {
                       {forgeError && (
                         <div className="flex gap-2 text-rose-450 bg-rose-950/20 border border-rose-900/30 p-3.5 rounded-xl mb-4 text-xs font-mono" style={{ color: '#f87171' }}>
                           <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                          <span>{forgeError} Returning fallback local generator puzzle.</span>
+                          <span>{forgeError} Returning standard logic matrix board.</span>
                         </div>
                       )}
 
@@ -1487,7 +1487,7 @@ export default function App() {
                         className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm tracking-widest uppercase transition-all shadow-lg active:scale-98 flex items-center justify-center gap-2 cursor-pointer font-sans"
                       >
                         <Sparkles className="w-4 h-4 text-slate-950 animate-spin" />
-                        Forge Infinite AI Puzzle
+                        Forge Procedural Logic Puzzle
                       </button>
                     </div>
                   )}

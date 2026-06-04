@@ -51,8 +51,8 @@ export default function RuleDiscoveryGame({ puzzle, onComplete, onExit }: RuleDi
           <span className="text-xs font-mono text-purple-400 font-bold bg-purple-950/50 px-2.5 py-1 rounded-full border border-purple-900">
             SEQUENCE PATTERN
           </span>
-          <span className="ml-2 text-[10px] font-mono text-neutral-500 uppercase bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-            {source === "gemini-ai" ? "🤖 Gemini AI" : "⚙️ Local Master"}
+          <span className="ml-2 text-[10px] font-mono text-cyan-400 uppercase bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+            ⚙️ Cabinet Logic Engine
           </span>
         </div>
         <div className="text-neutral-400 text-xs font-mono">

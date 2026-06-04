@@ -37,6 +37,7 @@ import MemoryMatrixGame from "./components/MemoryMatrixGame";
 import CodebreakerGame from "./components/CodebreakerGame";
 import ColorFloodGame from "./components/ColorFloodGame";
 import SlidingPuzzleGame from "./components/SlidingPuzzleGame";
+import BootScreen from "./components/BootScreen";
 import { soundEffects } from "./utils/audio";
 
 // Default seed player profile
@@ -69,8 +70,12 @@ export default function App() {
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [tempUsername, setTempUsername] = useState("");
   
+  // Arcade boot / attract screen: the cabinet shows a "PRESS START" title
+  // before dropping the player into the game proper.
+  const [booted, setBooted] = useState(false);
+
   // Custom game cabinet-focused states
-  const [crtEnabled, setCrtEnabled] = useState(false);
+  const [crtEnabled, setCrtEnabled] = useState(true);
   const [currentBadge, setCurrentBadge] = useState<string>("Logic Apprentice");
   const [unlockedBadges, setUnlockedBadges] = useState<string[]>(["Logic Apprentice"]);
   const [lootboxOpening, setLootboxOpening] = useState(false);
@@ -145,7 +150,7 @@ export default function App() {
     if (savedCrt !== null) {
       setCrtEnabled(savedCrt === "true");
     } else {
-      setCrtEnabled(false); // start off by default for clean visual unless toggled, or let's make it false so it's a great interactive reward
+      setCrtEnabled(true); // cabinet ships with the CRT tube glow on for max arcade feel
     }
     
     const savedDaily = localStorage.getItem("logicverse_daily_challenge");
@@ -465,8 +470,24 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen lg:h-screen w-full bg-[#0A0B0E] text-slate-200 flex flex-col font-sans selection:bg-cyan-500 selection:text-black relative overflow-x-hidden overflow-y-auto lg:overflow-hidden py-2.5 px-3 sm:py-3 sm:px-4 md:px-6">
-      
+    <div className="min-h-screen lg:h-screen w-full text-slate-200 flex flex-col font-sans selection:bg-cyan-500 selection:text-black relative overflow-x-hidden overflow-y-auto lg:overflow-hidden py-2.5 px-3 sm:py-3 sm:px-4 md:px-6">
+
+      {/* 🌌 Animated arcade game-world backdrop (neon grid floor + starfield) */}
+      <div className="game-world" />
+
+      {/* 🕹️ Arcade title / attract screen shown until the player presses start */}
+      <AnimatePresence>
+        {!booted && (
+          <BootScreen
+            onStart={() => {
+              setBooted(true);
+              soundEffects.playSelect();
+            }}
+            highScore={Math.max(1850, profile.xp + profile.level * 100)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* 📟 Retro Scanline CRT Overlay */}
       {crtEnabled && <div className="crt-overlay scanline-flicker" />}
 
@@ -482,9 +503,8 @@ export default function App() {
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping"></span>
               <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.4em] text-cyan-400 font-bold">★ LOGICVERSE RETRO GAME LAB ★</span>
             </div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-light tracking-tight text-white">
-              LOGIC<span className="font-bold text-cyan-400 animate-pulse">VERSE</span>
-              <span className="text-pink-500">.</span>
+            <h1 className="font-pixel text-arcade-logo text-sm sm:text-lg lg:text-2xl tracking-tight">
+              LOGIC<span className="text-cyan-300 animate-pulse">VERSE</span>
             </h1>
             <span className="text-[8px] sm:text-[9px] font-mono tracking-widest text-pink-500 uppercase font-bold mt-1 flex items-center gap-1">
               <span className="inline-block w-1 h-1 rounded-full bg-pink-500 animate-pulse"></span>
@@ -918,9 +938,9 @@ export default function App() {
                         </div>
                         <div className="text-right flex flex-col items-start md:items-end flex-shrink-0 relative z-20 font-mono">
                           <div className="text-xl font-mono text-cyan-400 mb-2 font-semibold">+350 XP BONUS</div>
-                          <button 
+                          <button
                             onClick={() => selectTab("daily")}
-                            className="px-6 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-450 text-slate-950 font-bold text-[10px] uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] cursor-pointer"
+                            className="arcade-btn px-6 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-450 text-slate-950 font-bold text-[10px] uppercase tracking-widest cursor-pointer"
                           >
                             Begin Trilogy
                           </button>
@@ -1236,9 +1256,9 @@ export default function App() {
                               <span className="text-xs text-[#64748b] font-normal">COST:</span>
                               <span>FREE!</span>
                             </div>
-                            <button 
+                            <button
                               onClick={handleOpenLootbox}
-                              className="w-full lg:w-auto px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-400 hover:to-rose-500 text-white font-mono text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-lg active:scale-95 cursor-pointer border border-pink-400/30"
+                              className="arcade-btn w-full lg:w-auto px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-400 hover:to-rose-500 text-white font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
                             >
                               🔓 Forge Lootbox
                             </button>
@@ -1484,7 +1504,7 @@ export default function App() {
 
                       <button
                         onClick={() => forgePuzzle(genCategory, genDifficulty)}
-                        className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm tracking-widest uppercase transition-all shadow-lg active:scale-98 flex items-center justify-center gap-2 cursor-pointer font-sans"
+                        className="arcade-btn w-full py-3.5 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-2 cursor-pointer font-sans"
                       >
                         <Sparkles className="w-4 h-4 text-slate-950 animate-spin" />
                         Forge Procedural Logic Puzzle

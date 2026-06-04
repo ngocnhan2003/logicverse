@@ -88,7 +88,7 @@ export default function SlidingPuzzleGame({ puzzle, onComplete, onExit }: Slidin
                 key={val === 0 ? 'empty' : val}
                 layout
                 onClick={() => handleTileClick(r, c)}
-                className={`w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center font-display font-medium text-lg sm:text-2xl rounded-md
+                className={`w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 flex items-center justify-center font-display font-medium text-base sm:text-xl md:text-2xl rounded-md
                   ${val === 0 ? 'bg-transparent shadow-inner cursor-default' : 'bg-slate-700 text-white cursor-pointer hover:bg-slate-600 shadow-md border border-slate-600'}
                   ${val !== 0 && (val === r * puzzle.gridSize + c + 1) ? 'text-amber-400 border-amber-500/30 bg-slate-700/80 shadow-[inset_0_0_10px_rgba(245,158,11,0.1)]' : ''}
                 `}

@@ -179,9 +179,9 @@ export default function SudokuGame({ puzzle, onComplete, onExit }: SudokuGamePro
   };
 
   return (
-    <div id="sudoku_game_panel" className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl p-6 select-none">
+    <div id="sudoku_game_panel" className="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl p-4 sm:p-6 select-none">
       {/* Game bar */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>
           <span className="text-xs font-mono text-cyan-400 font-bold bg-cyan-950/50 px-2.5 py-1 rounded-full border border-cyan-900">
             SUDOKU+ {sudokuSize}X{sudokuSize}
@@ -192,13 +192,13 @@ export default function SudokuGame({ puzzle, onComplete, onExit }: SudokuGamePro
             </span>
           )}
         </div>
-        <div className="text-neutral-400 text-sm font-mono tracking-wider">
+        <div className="text-slate-400 text-xs sm:text-sm font-mono tracking-wider">
           Timer: {formatTime(timeElapsed)}
         </div>
       </div>
 
       {sudokuSpecialRuleType === "even_odd" && (
-        <div className="mb-4 text-xs text-slate-400 bg-slate-950/60 p-3 rounded-2xl border border-slate-800">
+        <div className="mb-3 sm:mb-4 text-[10px] sm:text-xs text-slate-400 bg-slate-950/60 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-800">
           💡 <span className="text-purple-300 font-bold">Rule Discovery Special:</span> Blue shaded cells must contain **Even numbers** (2, 4, or 6).
         </div>
       )}
@@ -209,7 +209,7 @@ export default function SudokuGame({ puzzle, onComplete, onExit }: SudokuGamePro
           display: "grid",
           gridTemplateColumns: `repeat(${sudokuSize}, minmax(0, 1fr))`,
         }}
-        className="gap-1.5 p-3 rounded-2xl bg-slate-950/40 border border-slate-800 mb-6"
+        className="gap-1 sm:gap-1.5 p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-950/40 border border-slate-800 mb-4 sm:mb-6"
       >
         {board.map((row, r) =>
           row.map((val, c) => {
@@ -237,14 +237,14 @@ export default function SudokuGame({ puzzle, onComplete, onExit }: SudokuGamePro
               >
                 {/* Even cells highlight tag */}
                 {isEven && (
-                  <div className="absolute top-1 left-1 w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                  <div className="absolute top-1 left-1 w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-cyan-400" />
                 )}
 
                 {/* Number or Notes draft list */}
                 {val !== 0 ? (
-                  <span className="text-xl font-mono">{val}</span>
+                  <span className="text-base sm:text-xl font-mono">{val}</span>
                 ) : (
-                  <div className="grid grid-cols-2 gap-x-1.5 text-[8px] leading-3 font-mono opacity-60">
+                  <div className="grid grid-cols-2 gap-x-1 text-[7px] sm:text-[8px] leading-3 font-mono opacity-60">
                     {Array.from({ length: sudokuSize }).map((_, idx) => {
                       const num = idx + 1;
                       return notes[r]?.[c]?.[num] ? (
@@ -262,11 +262,11 @@ export default function SudokuGame({ puzzle, onComplete, onExit }: SudokuGamePro
       </div>
 
       {/* Control keypad */}
-      <div className="mb-6">
-        <div className="flex gap-2 mb-3">
+      <div className="mb-4 sm:mb-6">
+        <div className="flex gap-1.5 sm:gap-2 mb-2.5 sm:mb-3">
           <button
             onClick={() => setPencilMode(!pencilMode)}
-            className={`flex-1 py-2 px-3 rounded-xl border font-semibold flex items-center justify-center gap-1.5 text-xs transition-colors
+            className={`flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg sm:rounded-xl border font-semibold flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs transition-colors cursor-pointer
               ${pencilMode 
                 ? "bg-cyan-950 border-cyan-500 text-cyan-400" 
                 : "bg-slate-950 border-slate-800 text-neutral-400 hover:text-white"}`}
@@ -278,20 +278,20 @@ export default function SudokuGame({ puzzle, onComplete, onExit }: SudokuGamePro
           <button
             onClick={handleClearCell}
             disabled={!selectedCell || isOriginal(selectedCell.r, selectedCell.c)}
-            className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-rose-400 hover:bg-rose-950/30 text-xs font-semibold disabled:opacity-40"
+            className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-slate-950 border border-slate-800 text-rose-450 hover:bg-rose-950/30 text-[10px] sm:text-xs font-semibold disabled:opacity-40 cursor-pointer text-rose-400"
           >
             Clear Cell
           </button>
         </div>
 
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center gap-1.5 sm:gap-2">
           {Array.from({ length: sudokuSize }).map((_, idx) => {
             const num = idx + 1;
             return (
               <button
                 key={num}
                 onClick={() => handleInputNumber(num)}
-                className="w-12 h-12 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-lg font-mono font-bold text-white transition-all flex items-center justify-center border border-slate-700"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-base sm:text-lg font-mono font-bold text-white transition-all flex items-center justify-center border border-slate-700 cursor-pointer"
               >
                 {num}
               </button>

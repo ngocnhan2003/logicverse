@@ -214,24 +214,24 @@ export default function BinaryPuzzleGame({ puzzle, onComplete, onExit }: BinaryP
   };
 
   return (
-    <div id="binary_game_panel" className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl p-6 select-none animate-fade-in">
-      <div className="flex justify-between items-center mb-6">
+    <div id="binary_game_panel" className="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl p-4 sm:p-6 select-none animate-fade-in">
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>
           <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/50 px-2.5 py-1 rounded-full border border-emerald-900">
             BINARY PUZZLE 6X6
           </span>
         </div>
-        <div className="text-neutral-400 text-sm font-mono">
+        <div className="text-neutral-400 text-xs sm:text-sm font-mono animate-pulse">
           Timer: {formatTime(timeElapsed)}
         </div>
       </div>
 
-      <div className="mb-5 text-xs text-slate-400 bg-slate-950/60 p-3 rounded-2xl border border-slate-800 leading-relaxed">
+      <div className="mb-3 sm:mb-5 text-[10px] sm:text-xs text-slate-400 bg-slate-950/60 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-800 leading-relaxed">
         👉 Tap grids to cycle: <span className="font-bold text-slate-300">Empty → 0 → 1</span>. Every full row and column must contain exactly three 0s and three 1s, with no 3 identical digits consecutive.
       </div>
 
       {/* Grid container */}
-      <div className="grid grid-cols-6 gap-1.5 p-3 rounded-2xl bg-slate-950/40 border border-slate-800 mb-6">
+      <div className="grid grid-cols-6 gap-1 sm:gap-1.5 p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-950/40 border border-slate-800 mb-4 sm:mb-6">
         {grid.map((row, r) =>
           row.map((val, c) => {
             const editable = isEditable(r, c);
@@ -255,7 +255,7 @@ export default function BinaryPuzzleGame({ puzzle, onComplete, onExit }: BinaryP
                 key={`${r}-${c}`}
                 onClick={() => handleCellClick(r, c)}
                 className={`
-                  aspect-square flex justify-center items-center rounded-xl cursor-pointer transition-all duration-150 relative text-xl font-mono
+                  aspect-square flex justify-center items-center rounded-lg sm:rounded-xl cursor-pointer transition-all duration-150 relative text-base sm:text-xl font-mono
                   ${cellBg} ${textColor} hover:scale-105 active:scale-95
                 `}
               >

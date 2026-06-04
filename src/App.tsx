@@ -478,7 +478,7 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen w-screen bg-[#0A0B0E] text-slate-200 flex flex-col font-sans selection:bg-cyan-500 selection:text-black relative overflow-hidden py-3 px-4 md:px-6">
+    <div className="min-h-screen lg:h-screen w-full bg-[#0A0B0E] text-slate-200 flex flex-col font-sans selection:bg-cyan-500 selection:text-black relative overflow-x-hidden overflow-y-auto lg:overflow-hidden py-2.5 px-3 sm:py-3 sm:px-4 md:px-6">
       
       {/* 📟 Retro Scanline CRT Overlay */}
       {crtEnabled && <div className="crt-overlay scanline-flicker" />}
@@ -487,40 +487,40 @@ export default function App() {
       <div className="absolute top-[-10%] left-[-15%] w-[500px] h-[500px] rounded-full bg-cyan-950/10 filter blur-[100px] ambient-glow pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-15%] w-[600px] h-[600px] rounded-full bg-purple-950/5 filter blur-[120px] ambient-glow pointer-events-none" style={{ animationDelay: "4s" }} />
 
-      <div className="w-full max-w-7xl mx-auto flex flex-col flex-grow h-full min-h-0">
+      <div className="w-full max-w-7xl mx-auto flex flex-col flex-grow lg:h-full lg:min-h-0">
         {/* Header Navigation exactly matching retro arcade cabinet theme */}
-        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end border-b border-cyan-500/10 pb-3 mb-4 gap-2 w-full flex-shrink-0">
+        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end border-b border-cyan-500/10 pb-2 mb-2.5 lg:pb-3 lg:mb-4 gap-3 lg:gap-2 w-full flex-shrink-0">
           <div className="flex flex-col">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full bg-cyan-500 animate-ping"></span>
-              <span className="text-[10px] uppercase tracking-[0.4em] text-cyan-400 font-bold">★ LOGICVERSE RETRO GAME LAB ★</span>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping"></span>
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.4em] text-cyan-400 font-bold">★ LOGICVERSE RETRO GAME LAB ★</span>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-light tracking-tight text-white">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-light tracking-tight text-white">
               LOGIC<span className="font-bold text-cyan-400 animate-pulse">VERSE</span>
               <span className="text-pink-500">.</span>
             </h1>
-            <span className="text-[9px] font-mono tracking-widest text-pink-500 uppercase font-bold mt-1.5 flex items-center gap-1">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></span>
+            <span className="text-[8px] sm:text-[9px] font-mono tracking-widest text-pink-500 uppercase font-bold mt-1 flex items-center gap-1">
+              <span className="inline-block w-1 h-1 rounded-full bg-pink-500 animate-pulse"></span>
               CABINET INGRESS • READY PLAYER ONE
             </span>
           </div>
           
-          <div className="flex flex-wrap gap-6 sm:gap-10 items-center justify-between lg:justify-end w-full lg:w-auto">
+          <div className="flex flex-wrap gap-3 sm:gap-5 lg:gap-6 items-center justify-between lg:justify-end w-full lg:w-auto">
             {/* 📟 Game Console toggles (Sound/CRT) in header */}
-            <div className="flex gap-2 sm:gap-3 items-center bg-white/[0.02] border border-white/5 p-1.5 rounded-xl">
+            <div className="flex gap-1.5 sm:gap-2 items-center bg-white/[0.02] border border-white/5 p-1 rounded-lg">
               <button 
                 onClick={toggleSound} 
-                className={`px-3 py-1.5 rounded-lg border text-[10px] font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer select-none active:scale-95
+                className={`px-2 py-1 rounded border text-[9px] sm:text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer select-none active:scale-95
                   ${soundEnabled 
                     ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-neon-cyan" 
                     : "bg-white/5 border-white/10 text-slate-500"}`}
               >
-                {soundEnabled ? <Volume2 className="w-3.5 h-3.5 animate-pulse" /> : <VolumeX className="w-3.5 h-3.5" />}
+                {soundEnabled ? <Volume2 className="w-3 h-3 animate-pulse" /> : <VolumeX className="w-3 h-3" />}
                 SOUND
               </button>
               <button 
                 onClick={toggleCrt} 
-                className={`px-3 py-1.5 rounded-lg border text-[10px] font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer select-none active:scale-95
+                className={`px-2 py-1 rounded border text-[9px] sm:text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer select-none active:scale-95
                   ${crtEnabled 
                     ? "bg-pink-500/10 border-pink-500/30 text-pink-400 shadow-neon-pink" 
                     : "bg-white/5 border-white/10 text-slate-500"}`}
@@ -530,59 +530,59 @@ export default function App() {
             </div>
 
             <div className="text-right">
-              <p className="text-[10px] uppercase tracking-widest text-[#64748b] mb-1">Experience Level</p>
-              <div className="flex items-center gap-3">
-                <span className="text-xl font-mono text-white">LVL {profile.level}</span>
-                <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden p-[1px] border border-white/5">
+              <p className="text-[8px] sm:text-[10px] uppercase tracking-widest text-[#64748b] mb-0.5">Experience Level</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="text-sm sm:text-base lg:text-xl font-mono text-white">LVL {profile.level}</span>
+                <div className="w-20 sm:w-28 lg:w-32 h-1.5 sm:h-2 bg-white/10 rounded-full overflow-hidden p-[1px] border border-white/5">
                   <div 
                     className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-500 shadow-lg"
                     style={{ width: `${Math.min(100, Math.max(0, (profile.xp / (profile.level * 100)) * 100))}%` }}
                   />
                 </div>
-                <span className="text-[10px] font-mono text-cyan-400 opacity-90">{profile.xp}/{profile.level * 100} XP</span>
+                <span className="text-[8px] sm:text-[10px] font-mono text-cyan-400 opacity-90">{profile.xp}/{profile.level * 100} XP</span>
               </div>
             </div>
 
-            <div className="flex gap-6 sm:gap-8 items-center">
+            <div className="flex gap-4 sm:gap-6 lg:gap-8 items-center">
               {profile.streakDays > 0 && (
                 <div className="text-right">
-                  <p className="text-[10px] uppercase tracking-widest text-slate-505 mb-1" style={{ color: '#64748b' }}>Active Streak</p>
-                  <p className="text-xl font-mono text-amber-500 flex items-center gap-1 justify-end">
-                    <Flame className="w-4 h-4 text-amber-500 fill-amber-500 animate-pulse inline" />
+                  <p className="text-[8px] sm:text-[10px] uppercase tracking-widest text-slate-505 mb-0.5" style={{ color: '#64748b' }}>Active Streak</p>
+                  <p className="text-sm sm:text-base lg:text-xl font-mono text-amber-500 flex items-center gap-1 justify-end">
+                    <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 fill-amber-500 animate-pulse inline" />
                     {profile.streakDays} Days
                   </p>
                 </div>
               )}
               
               <div className="text-right">
-                <p className="text-[10px] uppercase tracking-widest text-slate-505 mb-1" style={{ color: '#64748b' }}>Stars</p>
-                <p className="text-xl font-mono text-purple-400 tracking-tighter flex items-center gap-1.5 justify-end">
-                  <Star className="w-4 h-4 text-purple-400 fill-purple-400 animate-spin" style={{ animationDuration: '3s' }} />
+                <p className="text-[8px] sm:text-[10px] uppercase tracking-widest text-slate-505 mb-0.5" style={{ color: '#64748b' }}>Stars</p>
+                <p className="text-sm sm:text-base lg:text-xl font-mono text-purple-400 tracking-tighter flex items-center gap-1 justify-end">
+                  <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400 fill-purple-400 animate-spin" style={{ animationDuration: '3s' }} />
                   {profile.stars}
                 </p>
               </div>
 
               <div className="text-right">
-                <p className="text-[10px] uppercase tracking-widest text-slate-505 mb-1" style={{ color: '#64748b' }}>Credits</p>
-                <p className="text-xl font-mono text-white tracking-tighter flex items-center gap-1.5 justify-end">
-                  <span className="text-cyan-400 text-sm">¢</span>
+                <p className="text-[8px] sm:text-[10px] uppercase tracking-widest text-slate-505 mb-0.5" style={{ color: '#64748b' }}>Credits</p>
+                <p className="text-sm sm:text-base lg:text-xl font-mono text-white tracking-tighter flex items-center gap-1 justify-end">
+                  <span className="text-cyan-400 text-xs sm:text-sm">¢</span>
                   {profile.coins}
                 </p>
               </div>
             </div>
 
-            <div className="w-10 h-10 rounded-full border border-cyan-500/30 flex items-center justify-center bg-cyan-500/5 cursor-pointer hover:border-cyan-400/50 transition-colors shadow-neon-cyan">
-              <div className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-ping"></div>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-cyan-500/30 flex items-center justify-center bg-cyan-500/5 cursor-pointer hover:border-cyan-400/50 transition-colors shadow-neon-cyan">
+              <div className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 bg-cyan-400 rounded-full animate-ping"></div>
             </div>
           </div>
         </header>
 
         {/* Dynamic Inner Layout Body */}
-        <main className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-4 items-start min-h-0 overflow-hidden">
+        <main className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 items-start lg:min-h-0 overflow-visible lg:overflow-hidden">
           
           {/* Conditional Layout: Hide sidebar navigation if active workspace details are running so we have full screens mapping */}
           {!(activePlay || isForging) && (
-            <nav className="col-span-1 lg:col-span-3 flex flex-col gap-3 h-full overflow-y-auto pr-1">
+            <nav className="col-span-1 lg:col-span-3 flex flex-col gap-2.5 sm:gap-3 lg:h-full lg:overflow-y-auto pr-1 overflow-visible pb-2 lg:pb-0">
               {/* Profile Heuristic Section */}
               <div className="bg-[#15171C] p-4 rounded-xl border border-cyan-500/15 shadow-neon-cyan relative overflow-hidden">
                 <div className="absolute top-0 right-0 bg-cyan-500/10 border-l border-b border-cyan-500/20 px-2 py-0.5 text-[7px] font-mono font-bold text-cyan-400 uppercase">
@@ -764,7 +764,7 @@ export default function App() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
-                  className="w-full flex flex-col gap-2"
+                  className="w-full flex flex-col gap-2 pb-10 lg:pb-0"
                 >
                   <div className="bg-[#15171C] border border-white/10 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2 shadow-lg">
                     <div className="flex items-center gap-2 font-mono">
@@ -912,7 +912,7 @@ export default function App() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="flex flex-col gap-3 h-full overflow-y-auto pr-1 pb-4"
+                  className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto overflow-visible pr-1 pb-4"
                 >
                   {activeTab === "dashboard" && (
                     <>

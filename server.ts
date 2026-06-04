@@ -119,57 +119,27 @@ function getLocalSudoku(difficulty: number) {
       sudokuEvenCells: template.evenCells,
     };
   } else {
-    // Elegant 6x6 Sudoku puzzle
+    // Elegant 6x6 Sudoku puzzle - mathematically perfect and guaranteed-solvable
     return {
       type: "sudoku",
       difficulty,
       questionText: "Classic 6x6 Sudoku. Fill the grid so rows, columns, and 2x3 blocks contain 1 to 6.",
       sudokuSize: 6,
       sudokuInitial: [
-        [0, 0, 4, 0, 0, 2],
-        [6, 0, 2, 0, 1, 0],
-        [0, 0, 0, 4, 0, 3],
-        [5, 0, 3, 0, 0, 0],
-        [0, 2, 0, 1, 0, 5],
-        [1, 0, 0, 2, 0, 0],
+        [1, 0, 0, 0, 5, 6],
+        [0, 5, 6, 0, 2, 0],
+        [2, 0, 1, 0, 0, 4],
+        [5, 0, 0, 2, 0, 1],
+        [0, 1, 2, 0, 4, 0],
+        [6, 4, 0, 0, 0, 2]
       ],
       sudokuSolution: [
-        [3, 1, 4, 5, 6, 2],
-        [6, 5, 2, 3, 1, 4],
-        [2, 9, 1, 4, 5, 3], // Wait correction
-        [5, 4, 3, 6, 2, 1],
-        [4, 2, 6, 1, 3, 5],
-        [1, 3, 5, 2, 4, 6],
-      ],
-      // Corrected fully compliant 6x6 Sudoku
-      sudokuInitialCorrected: [
-        [0, 3, 0, 4, 0, 0],
-        [0, 0, 6, 0, 3, 0],
-        [3, 0, 0, 0, 0, 4],
-        [4, 0, 0, 0, 0, 3],
-        [0, 4, 0, 3, 0, 0],
-        [0, 0, 3, 0, 4, 0]
-      ],
-      sudokuSolutionCorrected: [
-        [1, 3, 2, 4, 6, 5],
-        [5, 2, 6, 1, 3, 4],
-        [3, 1, 5, 2, 6, 4], // Let's simplify with robust 4x4 or beautiful math
-        [4, 6, 2, 5, 1, 3],
-        [2, 4, 1, 3, 5, 6],
-        [6, 5, 3, 6, 4, 2]
-      ],
-      sudokuSizeCorrect: 4, // 4 has robust validation and instant solve
-      sudokuInitialCorrect: [
-        [0, 4, 2, 0],
-        [2, 0, 0, 1],
-        [4, 0, 0, 2],
-        [0, 2, 1, 0]
-      ],
-      sudokuSolutionCorrect: [
-        [1, 4, 2, 3],
-        [2, 3, 4, 1],
-        [4, 1, 3, 2],
-        [3, 2, 1, 4]
+        [1, 2, 3, 4, 5, 6],
+        [4, 5, 6, 1, 2, 3],
+        [2, 3, 1, 5, 6, 4],
+        [5, 6, 4, 2, 3, 1],
+        [3, 1, 2, 6, 4, 5],
+        [6, 4, 5, 3, 1, 2]
       ],
       sudokuSpecialRuleType: "classic",
       sudokuEvenCells: []
@@ -434,7 +404,7 @@ Return exactly configured JSON format. No extra markdown, no backticks, no comme
 - Difficulty: ${targetDifficulty}/10
 - Format: JSON matching the standard responseSchema`;
 
-      const response = await gemini.models.generateContent({
+      const generatePromise = gemini.models.generateContent({
         model: "gemini-3.5-flash",
         contents: promptText,
         config: {
@@ -619,6 +589,12 @@ Return exactly configured JSON format. No extra markdown, no backticks, no comme
           }
         }
       });
+
+      const timeoutPromise = new Promise<any>((_, reject) =>
+        setTimeout(() => reject(new Error("Gemini AI model call timed out after 2.5 seconds.")), 2500)
+      );
+
+      const response = await Promise.race([generatePromise, timeoutPromise]);
 
       const text = response.text;
       if (text) {

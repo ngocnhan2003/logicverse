@@ -205,19 +205,6 @@ export default function App() {
 
   // 🎰 Gacha Lootbox station logic
   const handleOpenLootbox = () => {
-    // Check if player has enough credits
-    if (profile.coins < 40) {
-      soundEffects.playError();
-      alert("INSUFFICIENT LOGIC CREDITS (¢)! Earn at least 40 credits by solving cognitive game models.");
-      return;
-    }
-
-    // Spend coins
-    const updatedProfile = {
-      ...profile,
-      coins: profile.coins - 40,
-    };
-    saveProfile(updatedProfile);
     soundEffects.playForge();
     setLootboxOpening(true);
 
@@ -723,9 +710,9 @@ export default function App() {
                   >
                     <span className="text-sm font-medium flex items-center gap-2">
                       <ShoppingBag className="w-4 h-4 text-pink-405" style={{ color: '#f43f5e' }} />
-                      Logic Store
+                      Upgrades (Free)
                     </span>
-                    <span className="text-[10px] font-mono opacity-80 text-pink-400">CODES</span>
+                    <span className="text-[10px] font-mono opacity-80 text-pink-400">FREE</span>
                   </li>
                 </ul>
               </div>
@@ -735,16 +722,16 @@ export default function App() {
                 <div className="relative z-10">
                   <p className="text-[10px] font-bold text-white/90 mb-1 uppercase tracking-wider flex items-center gap-1.5 font-mono">
                     <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                    UNLIMITED AI PUZZLES
+                    UNLIMITED AI FORGING
                   </p>
                   <p className="text-[9px] text-cyan-100 mb-2 opacity-75 leading-relaxed">
-                    Get infinite, smart logical structures with our live Gemini engine.
+                    All premium solvers, badges, alternative interfaces, and hints are 100% free.
                   </p>
                   <button 
                     onClick={() => setActiveTab("premium")}
                     className="w-full py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 text-xs font-bold rounded-lg uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(6,182,212,0.15)] active:scale-95"
                   >
-                    Upgrade Pro
+                    Access Free Upgrades
                   </button>
                 </div>
                 <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-cyan-400/10 rounded-full blur-2xl"></div>
@@ -1219,7 +1206,7 @@ export default function App() {
                               Cognitive Title <span className="font-bold text-pink-500 animate-pulse">Lootbox</span>
                             </h2>
                             <p className="text-xs text-slate-400 max-w-xl leading-relaxed">
-                              Invest <span className="text-pink-450 font-bold font-mono" style={{ color: '#ec4899' }}>40 ¢ credits</span> to buy a specialized virtual cache. Unlocks legendary title badges like <span className="text-pink-405 font-bold" style={{ color: '#f43f5e' }}>Quantum Seeker</span> or <span className="text-pink-405 font-bold" style={{ color: '#f43f5e' }}>Binary Ninja</span> to display on your player profile!
+                              Unlock specialized virtual caches completely <span className="text-pink-450 font-bold font-mono animate-pulse" style={{ color: '#ec4899' }}>FOR FREE!</span> Unlocks legendary title badges like <span className="text-pink-405 font-bold" style={{ color: '#f43f5e' }}>Quantum Seeker</span> or <span className="text-pink-405 font-bold" style={{ color: '#f43f5e' }}>Binary Ninja</span> to display on your player profile!
                             </p>
                             
                             {/* List unlocked badges */}
@@ -1247,7 +1234,7 @@ export default function App() {
                           <div className="text-right flex flex-col items-start lg:items-end flex-shrink-0 w-full lg:w-auto font-mono">
                             <div className="text-2xl font-mono text-pink-405 text-pink-400 font-bold mb-3 flex items-center gap-1.5 leading-none" style={{ color: '#ec4899' }}>
                               <span className="text-xs text-[#64748b] font-normal">COST:</span>
-                              <span>40 ¢</span>
+                              <span>FREE!</span>
                             </div>
                             <button 
                               onClick={handleOpenLootbox}
@@ -1580,15 +1567,13 @@ export default function App() {
                           </div>
                           <div className="flex justify-between items-center pt-2.5 border-t border-white/[0.04] mt-auto">
                             <span className="text-xs font-mono text-amber-500 flex items-center gap-1 font-bold">
-                              ¢ 50 Credits
+                              FREE! (0 Credits)
                             </span>
                             <button
                               onClick={() => {
-                                if (profile.coins >= 50) {
-                                  saveProfile({ ...profile, coins: profile.coins - 50, stars: profile.stars + 1 });
-                                } else {
-                                  alert("Insufficient Coins!");
-                                }
+                                saveProfile({ ...profile, stars: profile.stars + 1 });
+                                soundEffects.playSuccess();
+                                alert("Supercharged Hint Bundle unlocked for free! Awarded +1 Bonus Star.");
                               }}
                               className="px-3 py-1.5 bg-[#06b6d4] hover:bg-cyan-500 text-slate-950 text-xs font-bold rounded-lg transition-colors font-mono uppercase"
                             >
@@ -1607,16 +1592,12 @@ export default function App() {
                           </div>
                           <div className="flex justify-between items-center pt-2.5 border-t border-white/[0.04] mt-auto">
                             <span className="text-xs font-mono text-purple-400 flex items-center gap-1 font-bold">
-                              ★ 5 Stars
+                              FREE! (0 Stars)
                             </span>
                             <button
                               onClick={() => {
-                                if (profile.stars >= 5) {
-                                  saveProfile({ ...profile, stars: profile.stars - 5 });
-                                  alert("Alternative UI module unlocked! Applied retro interface presets.");
-                                } else {
-                                  alert("Insufficient Stars!");
-                                }
+                                soundEffects.playSuccess();
+                                alert("Alternative UI module unlocked! Applied retro interface presets.");
                               }}
                               className="px-3 py-1.5 bg-[#06b6d4] hover:bg-cyan-500 text-slate-950 text-xs font-bold rounded-lg transition-colors font-mono uppercase"
                             >
@@ -1638,12 +1619,15 @@ export default function App() {
                               </p>
                             </div>
                             <div className="text-right flex-shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
-                              <span className="text-cyan-400 font-bold font-mono text-lg block">$4.99/mo</span>
+                              <span className="text-cyan-400 font-bold font-mono text-lg block">FREE LICENSE</span>
                               <button
-                                onClick={() => alert("LogicVerse Premium Subscribed successfully inside sandbox environment.")}
+                                onClick={() => {
+                                  soundEffects.playSuccess();
+                                  alert("LogicVerse VIP Live Forging active! Forge unlimited levels and boards for free!");
+                                }}
                                 className="w-full sm:w-auto px-4 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 rounded-lg text-xs font-bold mt-1.5 transition-all shadow-[0_0_15px_rgba(6,182,212,0.15)] uppercase tracking-wider font-mono"
                               >
-                                Subscribe
+                                Activate Free
                               </button>
                             </div>
                           </div>

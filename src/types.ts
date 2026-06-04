@@ -76,7 +76,7 @@ export interface SlidingPuzzle {
 }
 
 export interface ActivePuzzle {
-  source: "gemini-ai" | "local-engine";
+  source: "local-engine";
   type: GameType;
   difficulty: number;
   questionText: string;

@@ -9,7 +9,7 @@ interface RuleDiscoveryGameProps {
     ruleOptions: string[];
     ruleExplanation?: string;
     difficulty: number;
-    source: "gemini-ai" | "local-engine";
+    source: "local-engine";
   };
   onComplete: (xpEarned: number) => void;
   onExit: () => void;

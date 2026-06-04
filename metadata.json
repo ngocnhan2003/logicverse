@@ -1,6 +1,6 @@
 {
   "name": "LogicVerse",
-  "description": "AI-Powered Logic Puzzle Studio featuring Sudoku+, Rule Discovery, and Binary Puzzles with active AI generation.",
+  "description": "Logic Puzzle Studio featuring Sudoku+, Rule Discovery, and Binary Puzzles with a fully local procedural puzzle engine.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }
